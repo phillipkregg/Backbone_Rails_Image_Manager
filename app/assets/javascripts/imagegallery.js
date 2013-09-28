@@ -1,6 +1,8 @@
 
 var ImageGallery = {};
 
+ImageGallery.vent = _.extend({}, Backbone.Events);
+
 
 ImageGallery.Image = Backbone.Model.extend({
 });
@@ -65,6 +67,18 @@ ImageGallery.ImageListView = Backbone.View.extend({
   tagName: "ul",
   template: "#image-preview-template",
   
+  events: {
+    "click a": "imageClicked",
+  },
+  
+  imageClicked: function(e) {
+    e.preventDefault();
+    var id = $(e.currentTarget).data("id");
+    var image = this.collection.get(id);
+    ImageGallery.vent.trigger("image:selected", image);
+    
+  },
+  
   initialize: function() {
     _.bindAll(this, "renderImage");
     this.template = $(this.template);
@@ -102,16 +116,17 @@ $(function() {
   var imageData = [
     {
       id: 1,
-      url: "assets/island.jpeg",
-      name: "some islands",
-      description: "Some islands at sunset"
+      url: "assets/mountain.jpeg",
+      name: "A mountain",
+      description: "Mountain with grassy hill and tree"
+     
     },
     
     {
       id: 2,
-      url: "assets/mountain.jpeg",
-      name: "A mountain",
-      description: "Mountain with grassy hill and tree"
+      url: "assets/island.jpeg",
+      name: "some islands",
+      description: "Some islands at sunset"
     },
     
     {
@@ -136,6 +151,10 @@ $(function() {
   images.bind("add", function() {
     ImageGallery.addImage(images);
   });  
+  
+  ImageGallery.vent.bind("image:selected", function(image) {
+    alert(image.get("name"));
+  });
   
   var imageListView = new ImageGallery.ImageListView({
     collection: images
