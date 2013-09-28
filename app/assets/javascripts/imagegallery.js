@@ -51,7 +51,7 @@ ImageGallery.AddImageView = Backbone.View.extend({
     message += "URL: " + url;
     
     this.collection.add(this.model);
-    alert(message);
+    
   },
   
   render: function() {
@@ -66,40 +66,81 @@ ImageGallery.ImageListView = Backbone.View.extend({
   template: "#image-preview-template",
   
   initialize: function() {
-    this.collection.bind("add", this.imageAdded, this);
+    _.bindAll(this, "renderImage");
+    this.template = $(this.template);
+    this.collection.bind("add", this.renderImage, this);
   },
   
-  imageAdded: function(image) {
-    var html = $(this.template).tmpl(image.toJSON());
+  renderImage: function(image) {
+    var html = this.template.tmpl(image.toJSON());
     $(this.el).prepend(html);
+  }, 
+  
+  render: function() {
+    this.collection.each(this.renderImage)
   }
 
 });
 
 
+ImageGallery.addImage = function(images) {
+  var image = new ImageGallery.Image();
+  var addImageView = new ImageGallery.AddImageView({
+    model: image,
+    collection: images
+  });
   
+  addImageView.render();
+  
+  $("#main").html(addImageView.el);  
+}
+
+
+ // JQuery Dom ready Callback 
 $(function() { 
-    
-  var images = new ImageGallery.ImageCollection();
   
-  var addImage = function() {
-    var image = new ImageGallery.Image();
-    var addImageView = new ImageGallery.AddImageView({
-      model: image,
-      collection: images
-    });
+  var imageData = [
+    {
+      id: 1,
+      url: "assets/island.jpeg",
+      name: "some islands",
+      description: "Some islands at sunset"
+    },
     
-    addImageView.render();
+    {
+      id: 2,
+      url: "assets/mountain.jpeg",
+      name: "A mountain",
+      description: "Mountain with grassy hill and tree"
+    },
     
-    $("#main").html(addImageView.el);
-  }
+    {
+      id: 3,
+      url: "assets/tools.jpeg",
+      name: "rusty wrench",
+      description: "closup of a wrench"
+    },
+    
+    {
+      id: 4,
+      url: "assets/flower.jpeg",
+      name: "some flower",
+      description: "a purple flower"
+    }       
   
-  addImage();  
-  images.bind("add", addImage, this);  
+  ];  
+    
+  var images = new ImageGallery.ImageCollection(imageData);
+    
+  ImageGallery.addImage(images);  
+  images.bind("add", function() {
+    ImageGallery.addImage(images);
+  });  
   
   var imageListView = new ImageGallery.ImageListView({
     collection: images
   });
+  imageListView.render();
   
   $("#image-list").html(imageListView.el);
   
