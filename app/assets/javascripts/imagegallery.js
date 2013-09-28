@@ -19,7 +19,7 @@ ImageGallery.AddImageView = Backbone.View.extend({
   events: {
     "change #name": "nameChanged",
     "change #description": "descriptionChanged",
-    "change #url": "urlChanged",
+    "input #url": "urlChanged",
     "click #save": "saveImage"
   },
   
@@ -78,16 +78,24 @@ ImageGallery.ImageListView = Backbone.View.extend({
 
 
   
-$(function() {
-  var image = new ImageGallery.Image();
+$(function() { 
+    
   var images = new ImageGallery.ImageCollection();
-  var addImageView = new ImageGallery.AddImageView({
-    model: image,
-    collection: images
-  });
-  addImageView.render();
   
-  $("#main").html(addImageView.el);
+  var addImage = function() {
+    var image = new ImageGallery.Image();
+    var addImageView = new ImageGallery.AddImageView({
+      model: image,
+      collection: images
+    });
+    
+    addImageView.render();
+    
+    $("#main").html(addImageView.el);
+  }
+  
+  addImage();  
+  images.bind("add", addImage, this);  
   
   var imageListView = new ImageGallery.ImageListView({
     collection: images

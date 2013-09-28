@@ -143,7 +143,7 @@ a{
   float: right
   width: 300px;
   height: 200px;
-  background-image: url('/images/Select%20Image.png');
+  background-image: url('select_image.png');
   background-repeat: no-repeat;
   background-position: 100px 0px;
 }
