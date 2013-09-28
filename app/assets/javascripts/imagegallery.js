@@ -61,10 +61,20 @@ ImageGallery.AddImageView = Backbone.View.extend({
   
 });
 
-ImageGallery.ImageListView = {
+ImageGallery.ImageListView = Backbone.View.extend({
+  tagName: "ul",
+  template: "#image-preview-template",
+  
+  initialize: function() {
+    this.collection.bind("add", this.imageAdded, this);
+  },
+  
+  imageAdded: function(image) {
+    var html = $(this.template).tmpl(image.toJSON());
+    $(this.el).prepend(html);
+  }
 
-
-}
+});
 
 
   
@@ -78,6 +88,12 @@ $(function() {
   addImageView.render();
   
   $("#main").html(addImageView.el);
+  
+  var imageListView = new ImageGallery.ImageListView({
+    collection: images
+  });
+  
+  $("#image-list").html(imageListView.el);
   
 });
 
